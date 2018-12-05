@@ -7,6 +7,16 @@ class Transacoes
     @real = real
     @dolar = dolar
     @registro = []
+    if File.file?('log.txt') == true
+      f = File.readlines('log.txt')
+      f.each_with_index { |linha, index|
+        linha = f[index].split(' - ')
+        serial = {tipo: linha[1], coin: linha[2], cot: linha[3], total: linha[4]}
+        @registro << serial
+      }
+    else
+      File.new("log.txt", "w+")
+    end
   end
 
   def valida(val, coin)
@@ -116,6 +126,11 @@ class Transacoes
   def salva_operacoes(tipo, coin, cot, total)
     serial = {tipo: tipo, coin: coin, cot: cot, total: total}
     @registro << serial
+    File.open("log.txt", "w+") do |f|
+      @registro.each_with_index { |r, index|
+        f.puts "#{index+1} - #{r[:tipo]} - #{r[:coin]} - #{r[:cot]} - #{r[:total]}"
+      }
+    end
   end
 
   def mostra_operacoes()
