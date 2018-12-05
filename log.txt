@@ -2,3 +2,8 @@
 2 - compra - BRL - 4 - 30
 3 - venda - USD - 4 - 1233
 4 - compra - USD - 3 - 123
+5 - compra - USD - 3 - 345
+6 - venda - USD - 3 - 234
+7 - venda - BRL - 3 - 50
+8 - compra - USD - 2 - 123
+9 - compra - BRL - 3.6 - 65.11944444444444

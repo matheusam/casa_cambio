@@ -1,7 +1,7 @@
 class Main
-require_relative 'transacoes'
+  require_relative 'transacoes'
 
-attr_accessor :controle
+  attr_accessor :controle
   def initialize()
     @controle = nil
   end
@@ -9,7 +9,7 @@ attr_accessor :controle
   def self.menu()
     input = nil
     while input != 7
-      puts "\n\n[1] Comprar dólares"
+      puts "\n[1] Comprar dólares"
       puts "[2] Vender dólares"
       puts "[3] Comprar reais"
       puts "[4] Vender reais"
@@ -21,19 +21,19 @@ attr_accessor :controle
       case input
         when 1
           print "Digite o valor da compra em USD: "
-          v_dolar = gets.split[0].to_i
+          v_dolar = gets.split[0].to_f
           @controle.compra_dolar(v_dolar)
         when 2
           print "Digite o valor da venda em USD: "
-          v_dolar = gets.split[0].to_i
+          v_dolar = gets.split[0].to_f
           @controle.venda_dolar(v_dolar)
         when 3
           print "Digite o valor da compra em BRL: "
-          v_real = gets.split[0].to_i
+          v_real = gets.split[0].to_f
           @controle.compra_real(v_real)
         when 4
           print "Digite o valor da venda em BRL: "
-          v_real = gets.split[0].to_i
+          v_real = gets.split[0].to_f
           @controle.venda_real(v_real)
         when 5
           @controle.mostra_operacoes
@@ -53,11 +53,11 @@ attr_accessor :controle
 
   system('clear')
   puts "Entre com a cotação atual do dolar: "
-  cota = gets.split[0].to_i
+  cota = gets.split[0].to_f
   puts "Entre com o montante de reais disponíveis: "
-  real = gets.split[0].to_i
+  real = gets.split[0].to_f
   puts "Entre com o montante de dolares disponíveis: "
-  dolar = gets.split[0].to_i
+  dolar = gets.split[0].to_f
   system('clear')
   @controle = Transacoes.new(cota, real, dolar)
   menu()

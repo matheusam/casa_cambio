@@ -1,4 +1,5 @@
 class Transacoes
+  require 'terminal-table/import'
 
   attr_accessor :cota, :real, :dolar
 
@@ -134,13 +135,20 @@ class Transacoes
   end
 
   def mostra_operacoes()
-    @registro.each_with_index { | r, index |
-      puts "#{index+1} - #{r[:tipo]} - #{r[:coin]} - #{r[:cot]} - #{r[:total]}"
-    }
+    op = table do |t|
+      t.headings = 'Index', 'Tipo', 'Moeda', 'Cotação', 'Total USD'
+      @registro.each_with_index { | r, index |
+        t << :separator
+        t << [index+1, r[:tipo], r[:coin], r[:cot], r[:total]]
+      }
+    end
+    puts op
   end
 
   def balanco()
-    report = "Cotação do dia: #{@cota}\nQuantia de reais: R$ #{@real}\nQuantia de dolares: $ #{@dolar}"
+    report = table
+    report.headings = ["Cotação do dia", "Quantia em BRL: R$", "Quantia em USD: $"]
+    report <<  [@cota, @real, @dolar]
     puts report
   end
 
