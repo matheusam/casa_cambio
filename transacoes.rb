@@ -1,23 +1,22 @@
 class Transacoes
-  require 'terminal-table/import'
 
-  attr_accessor :cota, :real, :dolar
+  attr_accessor :input, :tipo, :coin, :cota, :real, :dolar, :total
 
-  def initialize(cota, real, dolar)
+  def initialize(input, cota, real, dolar)
+    if input.odd?
+      @tipo = "compra"
+    else
+      @tipo = "venda"
+    end
+    if input < 3
+      @coin = "USD"
+    else
+      @coin = "BRL"
+    end
     @cota = cota
     @real = real
     @dolar = dolar
-    @registro = []
-    if File.file?('log.txt') == true
-      f = File.readlines('log.txt')
-      f.each_with_index { |linha, index|
-        linha = f[index].split(' - ')
-        serial = {tipo: linha[1], coin: linha[2], cot: linha[3], total: linha[4]}
-        @registro << serial
-      }
-    else
-      File.new("log.txt", "w+")
-    end
+    @total = 0
   end
 
   def valida(val, coin)
@@ -66,15 +65,16 @@ class Transacoes
 
   def compra_dolar(v_dolar)
     total_r = to_brl(v_dolar)
+    @total = v_dolar
     if valida(total_r, "BRL")
       puts "Resumo da compra de USD"
-      puts "Valor solicitado em USD: $ #{v_dolar}"
+      puts "Valor solicitado em USD: $ #{@total}"
       puts "Valor total em BRL: R$ #{total_r}"
       puts "Cotação: 1 USD = #{@cota} BRL"
       if confirma?()
         @dolar += v_dolar
         @real -= total_r
-        salva_operacoes("compra", "USD", @cota, v_dolar)
+        arr = [@tipo, @coin, @cota, @total]
       end
     end
   end
@@ -82,74 +82,46 @@ class Transacoes
   def venda_dolar(v_dolar)
     if valida(v_dolar, "USD")
       total_r = to_brl(v_dolar)
+      @total = to_usd(total_r)
       puts "Resumo da venda de USD"
-      puts "Valor solicitado em USD: $ #{v_dolar}"
+      puts "Valor solicitado em USD: $ #{@total}"
       puts "Valor total em BRL: R$ #{total_r}"
       puts "Cotação: 1 USD = #{@cota} BRL"
       if confirma?()
         @dolar -= v_dolar
         @real += total_r
-        salva_operacoes("venda", "USD", @cota, to_usd(total_r))
+        arr = [@tipo, @coin, @cota, @total]
       end
     end
   end
 
   def compra_real(v_real)
-    total_d = to_usd(v_real)
+    @total = to_usd(v_real)
     if valida(v_real, "BRL")
       puts "Resumo da compra de BRL"
       puts "Valor solicitado em BRL: R$ #{v_real}"
-      puts "Valor total em USD: $ #{total_d}"
+      puts "Valor total em USD: $ #{@total}"
       puts "Cotação: 1 USD = #{@cota} BRL"
       if confirma?()
-        @dolar -= total_d
+        @dolar -= @total
         @real += v_real
-        salva_operacoes("compra", "BRL", @cota, total_d)
+        arr = [@tipo, @coin, @cota, @total]
       end
     end
   end
 
   def venda_real(v_real)
+    @total = to_usd(v_real)
     if valida(v_real, "USD")
-      total_d = to_usd(v_real)
       puts "Resumo da venda de BRL"
       puts "Valor solicitado em BRL: R$ #{v_real}"
-      puts "Valor total em USD: $ #{total_d}"
+      puts "Valor total em USD: $ #{@total}"
       puts "Cotação: 1 USD = #{@cota} BRL"
       if confirma?()
         @real -= v_real
-        @dolar += total_d
-        salva_operacoes("venda", "BRL", @cota, total_d)
+        @dolar += @total
+        arr = [@tipo, @coin, @cota, @total]
       end
     end
   end
-
-  def salva_operacoes(tipo, coin, cot, total)
-    serial = {tipo: tipo, coin: coin, cot: cot, total: total}
-    @registro << serial
-    File.open("log.txt", "w+") do |f|
-      @registro.each_with_index { |r, index|
-        f.puts "#{index+1} - #{r[:tipo]} - #{r[:coin]} - #{r[:cot]} - #{r[:total]}"
-      }
-    end
-  end
-
-  def mostra_operacoes()
-    op = table do |t|
-      t.headings = 'Index', 'Tipo', 'Moeda', 'Cotação', 'Total USD'
-      @registro.each_with_index { | r, index |
-        t << :separator
-        t << [index+1, r[:tipo], r[:coin], r[:cot], r[:total]]
-      }
-    end
-    puts op
-  end
-
-  def balanco()
-    report = table
-    report.headings = ["Cotação do dia", "Quantia em BRL: R$", "Quantia em USD: $"]
-    report <<  [@cota, @real, @dolar]
-    puts report
-  end
-
 end
